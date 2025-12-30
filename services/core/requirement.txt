@@ -1,0 +1,8 @@
+Django>=6.0
+djangorestframework
+djangorestframework-simplejwt
+psycopg2-binary
+python-json-logger
+sentry-sdk
+celery
+redis

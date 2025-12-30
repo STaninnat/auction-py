@@ -206,11 +206,14 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Secrets
-secrets/
-!secrets/.gitkeep   # Keep the placeholder file in the repository
-
 # Docker
-.docker_data/
-postgres_data/
-valkey_data/
+Dockerfile
+.dockerignore
+
+# Secrets
+../../secrets/
+
+# others
+README.md
+.git
+.gitignore
