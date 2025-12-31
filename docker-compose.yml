@@ -24,6 +24,7 @@ services:
   core:
     image: auction/core:latest
     container_name: auction_core
+    user: "${USER_ID}:${GROUP_ID}"
     build: ./services/core
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
@@ -34,6 +35,7 @@ services:
     environment:
       - DEBUG=${DEBUG}
       - SECRET_KEY=${DJANGO_SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
       - DB_NAME=${POSTGRES_DB}
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}

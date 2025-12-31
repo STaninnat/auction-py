@@ -6,3 +6,4 @@ python-json-logger
 sentry-sdk
 celery
 redis
+python-decouple
