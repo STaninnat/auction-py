@@ -1,0 +1,9 @@
+fastapi[standard]
+sqlalchemy
+asyncpg
+redis
+python-json-logger
+sentry-sdk
+PyJWT
+cryptography
+requests

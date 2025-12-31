@@ -1,0 +1,76 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: auction_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - auction_network
+
+  valkey:
+    image: valkey/valkey:latest
+    container_name: auction_valkey
+    ports:
+      - "6379:6379"
+    volumes:
+      - valkey_data:/data
+    networks:
+      - auction_network
+  
+  core:
+    image: auction/core:latest
+    container_name: auction_core
+    user: "${USER_ID}:${GROUP_ID}"
+    build: ./services/core
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./services/core:/app
+      - ./secrets:/app/secrets
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=${DEBUG}
+      - SECRET_KEY=${DJANGO_SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=${POSTGRES_HOST}
+      - CELERY_BROKER_URL=redis://${VALKEY_HOST}:${VALKEY_PORT}/0
+    depends_on:
+      - db
+      - valkey
+    networks:
+      - auction_network
+  
+  realtime:
+    image: auction/realtime:latest
+    container_name: auction_realtime
+    build: ./services/realtime
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./services/realtime:/app
+      - ./secrets:/app/secrets
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}/${POSTGRES_DB}
+      - VALKEY_URL=redis://${VALKEY_HOST}:${VALKEY_PORT}/0
+    depends_on:
+      - db
+      - valkey
+    networks:
+      - auction_network
+  
+volumes:
+  postgres_data:
+  valkey_data:
+
+networks:
+  auction_network:
+    driver: bridge
+      
