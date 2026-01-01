@@ -1,5 +1,6 @@
-from fastapi import FastAPI
 import logging
+
+from fastapi import FastAPI
 
 # Basic setup for logging
 logging.basicConfig(level=logging.INFO)
@@ -7,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 # Create FastAPI app
 app = FastAPI()
+
 
 # Basic route
 @app.get("/")
