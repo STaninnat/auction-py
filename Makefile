@@ -1,6 +1,6 @@
 DOCKER_COMPOSE = docker-compose
 
-.PHONY: help up down restart build logs logs-core logs-realtime shell-core shell-realtime migrate makemigrations superuser test clean
+.PHONY: help up down restart build logs logs-core logs-realtime shell-core shell-realtime migrate makemigrations superuser test clean pre-commit format
 
 help:
 	@echo "==================================================================="
@@ -27,6 +27,8 @@ help:
 	@echo "Testing & Maintenance:"
 	@echo "  make test            : Run tests (Pytest)"
 	@echo "  make clean           : Remove pycache and orphan containers"
+	@echo "  make pre-commit      : Run pre-commit hooks"
+	@echo "  make format          : Run Ruff formatter"
 	@echo "==================================================================="
 
 up:
@@ -71,3 +73,10 @@ test:
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	$(DOCKER_COMPOSE) down -v --remove-orphans
+
+pre-commit:
+	pre-commit run --all-files
+
+format:
+	ruff format .
+	ruff check --fix .

@@ -1,0 +1,40 @@
+default_language_version:
+  python: python3.13
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+        additional_dependencies: &ruamel_pin ["ruamel.yaml<0.19.0"]
+      - id: check-added-large-files
+        additional_dependencies: *ruamel_pin
+      - id: detect-private-key
+        additional_dependencies: *ruamel_pin
+      - id: trailing-whitespace
+        additional_dependencies: *ruamel_pin
+      - id: end-of-file-fixer
+        additional_dependencies: *ruamel_pin
+      - id: check-merge-conflict
+        additional_dependencies: *ruamel_pin
+      - id: check-toml
+        additional_dependencies: *ruamel_pin
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.10
+    hooks:
+      - id: ruff
+        args: [ --fix ]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.19.1
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-requests
+          - types-PyYAML
+          - django-stubs
+          - celery-types
+          - python-decouple-stubs
+          - djangorestframework-stubs
+        exclude: ^(docker/|migrations/|venv/|__pycache__/)
