@@ -127,7 +127,7 @@ STATIC_URL = 'static/'
 # Sentry Config (Error Tracking)
 # https://docs.sentry.io/platforms/python/django/
 
-SENTRY_DSN = config('SENTRY_DSN', default=None)
+SENTRY_DSN = config('SENTRY_DSN_CORE', default=None)
 
 if SENTRY_DSN:
     sentry_sdk.init(

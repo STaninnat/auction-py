@@ -8,7 +8,7 @@ logger_setup = LoggerSetup()
 root_logger = logger_setup.configure()
 
 # Setup Sentry
-SENTRY_DSN = config("SENTRY_DSN", default=None)
+SENTRY_DSN = config("SENTRY_DSN_REALTIME", default=None)
 if SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
