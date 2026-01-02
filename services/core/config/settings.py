@@ -14,6 +14,8 @@ from pathlib import Path
 from decouple import config, Csv
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,13 +24,32 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS: list[str] = config('ALLOWED_HOSTS', default=[], cast=Csv())  # type: ignore
+
+SECRETS_DIR = Path('/app/secrets')
+
+def load_key(filename: str) -> bytes:
+    """Helper function (Functional style) for securely reading key files"""
+    try:
+        with open(SECRETS_DIR / filename, 'rb') as f:
+            return f.read()
+    except FileNotFoundError:
+        if DEBUG:
+            print(f"WARNING: {filename} not found, generating ephemeral key.")
+            from cryptography.hazmat.primitives import serialization
+            from cryptography.hazmat.primitives.asymmetric import rsa
+            key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+            if "private" in filename:
+                return key.private_bytes(encoding=serialization.Encoding.PEM, format=serialization.PrivateFormat.PKCS8, encryption_algorithm=serialization.NoEncryption())
+            return key.public_key().public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo)
+        raise RuntimeError(f"Critical Security Error: {filename} not found in {SECRETS_DIR}")
+
+PRIVATE_KEY = load_key("private_key.pem")
+PUBLIC_KEY = load_key("public_key.pem")
 
 
 # Application definition
@@ -40,6 +61,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # 3rd Party Apps
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+
+    # Local Apps
+    "users",
+    "common",
 ]
 
 MIDDLEWARE = [
@@ -104,6 +134,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTH_USER_MODEL = 'users.User'
 
 
 # Internationalization
@@ -186,4 +218,31 @@ LOGGING = {
             'propagate': False,
         },
     }
+}
+
+
+#  SimpleJWT Config (Security Hardening)
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+
+    'ALGORITHM': 'RS256',
+    'SIGNING_KEY': PRIVATE_KEY,
+    'VERIFYING_KEY': PUBLIC_KEY,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
 }
