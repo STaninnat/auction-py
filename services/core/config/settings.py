@@ -135,6 +135,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'users.User'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -217,11 +219,6 @@ LOGGING = {
         },
     }
 }
-
-
-# Update to new User model
-
-AUTH_USER_MODEL = 'users.User'
 
 
 #  SimpleJWT Config (Security Hardening)
