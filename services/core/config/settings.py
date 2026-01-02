@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 from decouple import config, Csv
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -120,3 +122,68 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+
+# Sentry Config (Error Tracking)
+# https://docs.sentry.io/platforms/python/django/
+
+SENTRY_DSN = config('SENTRY_DSN', default=None)
+
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=1.0, # Reduce the Prod (e.g., 0.1) to save Quota.
+        send_default_pii=True,
+        environment='development' if DEBUG else 'production',
+    )
+
+
+# Logging Config (Hybrid: JSON for Prod, Console for Dev)
+
+LOG_RENDER = 'json' if not DEBUG else 'readable'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'json': {
+            # JSON Format: Suitable for ELK Stack, Datadog.
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            'fmt': '%(levelname)s %(asctime)s %(name)s %(module)s %(message)s'
+        },
+        'readable': {
+            # Human Readable: Suitable for developers to view via Terminal.
+            'format': '[\033[92m%(asctime)s\033[0m] \033[1m%(levelname)-8s\033[0m %(name)s: %(message)s',
+            'datefmt': '%H:%M:%S',
+            'style': '%'
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': LOG_RENDER,  # Select automatic
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': config('LOG_LEVEL', default='INFO'),
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if DEBUG else 'ERROR', # Dev sees the SQL Query, Prod doesn't.
+            'propagate': False,
+        },
+        'users': {
+            'handlers': ['console'],
+            'level': config('LOG_LEVEL', default='DEBUG'),
+            'propagate': False,
+        },
+    }
+}
