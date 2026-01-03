@@ -1,0 +1,25 @@
+from django.contrib import admin
+
+from .models import Wallet, WalletTransaction
+
+
+class WalletTransactionInline(admin.TabularInline):
+    model = WalletTransaction
+    extra = 0
+    readonly_fields = ("transaction_type", "amount", "reference_id", "created_at")
+    can_delete = False
+
+
+@admin.register(Wallet)
+class WalletAdmin(admin.ModelAdmin):
+    list_display = ("user", "balance", "held_balance", "updated_at")
+    search_fields = ("user__username", "user__email")
+    inlines = [WalletTransactionInline]
+
+
+@admin.register(WalletTransaction)
+class WalletTransactionAdmin(admin.ModelAdmin):
+    list_display = ("wallet", "transaction_type", "amount", "created_at")
+    list_filter = ("transaction_type",)
+    readonly_fields = ("wallet", "transaction_type", "amount", "reference_id", "created_at")
+    search_fields = ("wallet__user__username", "reference_id")

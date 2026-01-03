@@ -70,6 +70,8 @@ INSTALLED_APPS = [
     # Local Apps
     "users",
     "common",
+    "auctions",
+    "payments",
 ]
 
 MIDDLEWARE = [

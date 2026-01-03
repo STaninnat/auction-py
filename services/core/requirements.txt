@@ -7,3 +7,4 @@ sentry-sdk
 celery
 redis
 python-decouple
+Pillow
