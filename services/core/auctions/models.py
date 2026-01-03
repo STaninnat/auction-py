@@ -10,6 +10,10 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Product(UUIDMixin, TimestampMixin):  # type: ignore
+    """
+    Products to be auctioned (separate from the main auction items to ensure they are reusable).
+    """
+
     owner: models.ForeignKey = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
