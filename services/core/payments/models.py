@@ -36,8 +36,8 @@ class Wallet(UUIDMixin, TimestampMixin):
     class Meta:
         constraints = [
             # Constraint: balance and held_balance must be non-negative
-            models.CheckConstraint(check=Q(balance__gte=0), name="check_wallet_balance_positive"),
-            models.CheckConstraint(check=Q(held_balance__gte=0), name="check_held_balance_positive"),
+            models.CheckConstraint(condition=Q(balance__gte=0), name="check_wallet_balance_positive"),
+            models.CheckConstraint(condition=Q(held_balance__gte=0), name="check_held_balance_positive"),
         ]
 
     def __str__(self):

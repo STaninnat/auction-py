@@ -105,14 +105,14 @@ class AuctionListing(UUIDMixin, TimestampMixin):
         constraints = [
             # Constraint 1: start_time must be before end_time
             models.CheckConstraint(
-                check=Q(end_time__gt=F("start_time")),
+                condition=Q(end_time__gt=F("start_time")),
                 name="check_end_time_after_start_time",
             ),
             # Constraint 2: starting_price must be greater than 0
-            models.CheckConstraint(check=Q(start_price__gt=0), name="check_start_price_positive"),
+            models.CheckConstraint(condition=Q(start_price__gt=0), name="check_start_price_positive"),
             # Constraint 3: current_price must be greater than starting_price
             models.CheckConstraint(
-                check=Q(current_price__gte=F("start_price")), name="check_current_price_gte_start_price"
+                condition=Q(current_price__gte=F("start_price")), name="check_current_price_gte_start_price"
             ),
         ]
 
@@ -144,7 +144,7 @@ class BidTransaction(UUIDMixin, TimestampMixin):
         ]
         constraints = [
             # Constraint: The bid price cannot be negative or zero.
-            models.CheckConstraint(check=Q(amount__gt=0), name="check_bid_amount_positive"),
+            models.CheckConstraint(condition=Q(amount__gt=0), name="check_bid_amount_positive"),
         ]
 
     def __str__(self):
