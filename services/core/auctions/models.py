@@ -109,10 +109,10 @@ class AuctionListing(UUIDMixin, TimestampMixin):
                 name="check_end_time_after_start_time",
             ),
             # Constraint 2: starting_price must be greater than 0
-            models.CheckConstraint(condition=Q(start_price__gt=0), name="check_start_price_positive"),
+            models.CheckConstraint(condition=Q(starting_price__gt=0), name="check_starting_price_positive"),
             # Constraint 3: current_price must be greater than starting_price
             models.CheckConstraint(
-                condition=Q(current_price__gte=F("start_price")), name="check_current_price_gte_start_price"
+                condition=Q(current_price__gte=F("starting_price")), name="check_current_price_gte_starting_price"
             ),
         ]
 
