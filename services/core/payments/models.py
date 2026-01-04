@@ -44,7 +44,7 @@ class Wallet(UUIDMixin, TimestampMixin):
         return f"Wallet of {self.user} (Avail: {self.balance}, Held: {self.held_balance})"
 
 
-class WalletTransaction(UUIDMixin, TimestampMixin):  # type: ignore
+class WalletTransaction(UUIDMixin, TimestampMixin):
     """
     Audit Log: The entire financial transaction history.
     """
