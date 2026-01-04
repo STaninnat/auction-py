@@ -9,7 +9,7 @@ from django.db.models import F, Q
 from django.utils.translation import gettext_lazy as _
 
 
-class Product(UUIDMixin, TimestampMixin):  # type: ignore
+class Product(UUIDMixin, TimestampMixin):
     """
     Products to be auctioned (separate from the main auction items to ensure they are reusable).
     """
