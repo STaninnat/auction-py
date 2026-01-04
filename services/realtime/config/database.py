@@ -1,6 +1,6 @@
 from decouple import config
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.orm import declarative_base
 
 DB_USER = config("DB_USER")
 DB_PASSWORD = config("DB_PASSWORD")
@@ -20,9 +20,8 @@ engine = create_async_engine(
 
 # Create Session (The session for connection)
 # Every time a Request comes in, we will retrieve a Session from here.
-AsyncSessionLocal = sessionmaker(
+AsyncSessionLocal = async_sessionmaker(
     engine,
-    class_=AsyncSession,
     expire_on_commit=False,
 )
 

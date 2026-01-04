@@ -37,4 +37,9 @@ repos:
           - celery-types
           - python-decouple-stubs
           - djangorestframework-stubs
+          - sqlalchemy
+          - redis
+          - fastapi
+          - pydantic
+          - sentry-sdk
         exclude: ^(docker/|migrations/|venv/|__pycache__/)
