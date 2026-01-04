@@ -17,6 +17,15 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+          cache: 'pip'
+
+      - name: Cache Ruff
+        uses: actions/cache@v4
+        with:
+          path: .ruff_cache
+          key: ruff-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            ruff-${{ runner.os }}-
 
       - name: Install Ruff
         run: |
@@ -38,6 +47,15 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+          cache: 'pip'
+
+      - name: Cache MyPy
+        uses: actions/cache@v4
+        with:
+          path: .mypy_cache
+          key: mypy-${{ runner.os }}-${{ hashFiles('services/core/requirements.txt', 'services/realtime/requirements.txt') }}-${{ github.sha }}
+          restore-keys: |
+            mypy-${{ runner.os }}-${{ hashFiles('services/core/requirements.txt', 'services/realtime/requirements.txt') }}-
 
       - name: Install dependencies
         run: |
