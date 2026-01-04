@@ -253,7 +253,7 @@ SIMPLE_JWT = {
 # Celery Config
 
 CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://valkey:6379/0')
-CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://valkey:6379/0')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://valkey:6379/1')
 
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
