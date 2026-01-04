@@ -1,6 +1,6 @@
 DOCKER_COMPOSE = docker-compose
 
-.PHONY: help up down restart build logs logs-core logs-realtime shell-core shell-realtime migrate makemigrations superuser test clean pre-commit format
+.PHONY: help up down restart build logs logs-core logs-worker logs-realtime shell-core shell-realtime migrate makemigrations superuser test clean pre-commit format
 
 help:
 	@echo "==================================================================="
@@ -19,6 +19,7 @@ help:
 	@echo "  make superuser       : Create a Django superuser"
 	@echo "  make shell-core      : Access Django container shell (bash)"
 	@echo "  make logs-core       : Follow logs for Core service only"
+	@echo "  make logs-worker     : Follow logs for Worker service only"
 	@echo ""
 	@echo "FastAPI (Realtime) Commands:"
 	@echo "  make shell-realtime  : Access FastAPI container shell (bash)"
@@ -48,6 +49,9 @@ logs:
 
 logs-core:
 	$(DOCKER_COMPOSE) logs -f core
+
+logs-worker:
+	$(DOCKER_COMPOSE) logs -f worker
 
 logs-realtime:
 	$(DOCKER_COMPOSE) logs -f realtime
