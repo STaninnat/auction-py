@@ -247,6 +247,11 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
+
+    'AUDIENCE': config('JWT_AUDIENCE', default='auction:realtime'),
+    'ISSUER': config('JWT_ISSUER', default='auction:core'),
+
+    'TOKEN_OBTAIN_SERIALIZER': 'users.serializers.MyTokenObtainPairSerializer',
 }
 
 
