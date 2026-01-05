@@ -4,7 +4,8 @@ from sqlalchemy.dialects.postgresql import UUID
 
 
 class User(Base):
-    __tablename__ = "users_user"
+    # SYNC: Matches Django 'users.User' model (Explicit db_table="users")
+    __tablename__ = "users"
 
     id = Column(UUID(as_uuid=False), primary_key=True)
     username = Column(String)
@@ -12,6 +13,7 @@ class User(Base):
 
 
 class AuctionListing(Base):
+    # SYNC: Matches Django 'auctions.AuctionListing' model (Default: auctions_auctionlisting)
     __tablename__ = "auctions_auctionlisting"
 
     id = Column(UUID(as_uuid=False), primary_key=True)
@@ -20,11 +22,12 @@ class AuctionListing(Base):
 
 
 class BidTransaction(Base):
+    # SYNC: Matches Django 'auctions.BidTransaction' model (Default: auctions_bidtransaction)
     __tablename__ = "auctions_bidtransaction"
 
     id = Column(UUID(as_uuid=False), primary_key=True)
     amount = Column(Numeric(12, 2))
     auction_id = Column(UUID(as_uuid=False), ForeignKey("auctions_auctionlisting.id"))
-    bidder_id = Column(UUID(as_uuid=False), ForeignKey("users_user.id"))
+    bidder_id = Column(UUID(as_uuid=False), ForeignKey("users.id"))
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
