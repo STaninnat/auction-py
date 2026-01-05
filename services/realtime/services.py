@@ -34,7 +34,7 @@ class AuctionService:
             if amount <= auction.current_price:
                 return {
                     "success": False,
-                    "error": "Bid amount must be higher than current price {auction.current_price}",
+                    "error": f"Bid amount must be higher than current price {auction.current_price}",
                 }
 
             # Update auction current price
