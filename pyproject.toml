@@ -14,6 +14,9 @@ exclude = [
 select = ["E", "F", "I", "B"]
 ignore = []
 
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends"]
+
 [tool.ruff.format]
 quote-style = "double"
 
