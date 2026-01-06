@@ -5,13 +5,14 @@ from decimal import Decimal
 from models import AuctionListing, BidTransaction
 from sqlalchemy import insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from utils.auth import AuthenticatedUser
 
 
 class AuctionService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def place_bid(self, auction_id: str, user_id: str, amount: Decimal) -> dict:
+    async def place_bid(self, auction_id: str, user: AuthenticatedUser, amount: Decimal) -> dict:
         """
         Thread-Safe (Concurrency Handled) Auction Function
         """
@@ -28,7 +29,7 @@ class AuctionService:
                 return {"success": False, "error": "Auction not found"}
 
             # Validate auction status
-            if auction.status != "active":
+            if auction.status != "ACTIVE":
                 return {"success": False, "error": "Auction is not active"}
 
             if amount <= auction.current_price:
@@ -48,7 +49,7 @@ class AuctionService:
                 insert(BidTransaction).values(
                     id=new_bid_id,
                     auction_id=auction_id,
-                    bidder_id=user_id,
+                    bidder_id=user.id,
                     amount=amount,
                     created_at=datetime.utcnow(),
                     updated_at=datetime.utcnow(),
@@ -60,9 +61,11 @@ class AuctionService:
 
             return {
                 "success": True,
-                "bidder_id": user_id,
-                "auction_id": auction_id,
-                "new_price": amount,
+                "bidder_id": str(user.id),
+                "bidder_name": user.username or "Unknown",
+                "auction_id": str(auction_id),
+                "new_price": str(amount),
+                "timestamp": datetime.utcnow().isoformat(),
             }
 
         except Exception as e:
