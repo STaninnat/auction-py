@@ -29,7 +29,7 @@ class AuctionService:
                 return {"success": False, "error": "Auction not found"}
 
             # Validate auction status
-            if auction.status != "active":
+            if auction.status != "ACTIVE":
                 return {"success": False, "error": "Auction is not active"}
 
             if amount <= auction.current_price:
