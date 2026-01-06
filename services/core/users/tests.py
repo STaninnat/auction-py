@@ -1,3 +1,5 @@
+from typing import Any, cast
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -91,7 +93,7 @@ class AuthenticationTests(APITestCase):
         self.assertEqual(response.cookies[settings.AUTH_COOKIE_REFRESH].value, "")
 
         with self.assertRaises(TokenError):
-            RefreshToken(refresh_token_str).check_blacklist()
+            RefreshToken(cast(Any, refresh_token_str)).check_blacklist()
 
     def test_refresh_token_cookie(self):
         """Test refreshing token using cookie."""
