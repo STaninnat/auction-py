@@ -2,6 +2,10 @@ import logging
 import time
 
 from celery import shared_task
+from django.db import transaction
+from django.utils import timezone
+
+from .models import AuctionListing
 
 logger = logging.getLogger(__name__)
 
@@ -34,3 +38,33 @@ def notify_winner_task(self, auction_id: str):
     except Exception as exc:
         logger.error(f"Failed to send email for Auction {auction_id}: {exc}")
         raise self.retry(exc=exc, countdown=60) from exc
+
+
+@shared_task
+def check_and_close_expired_auctions():
+    """
+    Task for checking and closing expired auctions (running in the background every 1 minute).
+    """
+
+    now = timezone.now()
+
+    with transaction.atomic():
+        expired_auctions = AuctionListing.objects.select_for_update().filter(
+            status=AuctionListing.Status.ACTIVE,
+            end_time__lt=now,
+        )
+
+        count = 0
+        for auction in expired_auctions:
+            if auction.current_price > auction.starting_price:
+                auction.status = AuctionListing.Status.FINISHED
+                notify_winner_task.delay(auction.id)
+            else:
+                auction.status = AuctionListing.Status.EXPIRED
+
+            auction.save()
+            count += 1
+
+    logger.info(f"Closed {count} expired auctions.")
+
+    return f"Closed {count} expired auctions."
