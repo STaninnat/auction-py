@@ -233,8 +233,9 @@ LOGGING = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'users.authentication.CustomJWTAuthentication',
     ),
+
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
@@ -257,8 +258,18 @@ SIMPLE_JWT = {
     'AUDIENCE': config('JWT_AUDIENCE', default='auction:realtime'),
     'ISSUER': config('JWT_ISSUER', default='auction:core'),
 
+
     'TOKEN_OBTAIN_SERIALIZER': 'users.serializers.MyTokenObtainPairSerializer',
 }
+
+
+# Cookie Auth Settings
+AUTH_COOKIE = 'access_token'
+AUTH_COOKIE_REFRESH = 'refresh_token'
+AUTH_COOKIE_SECURE = not DEBUG  # True in prod, False in dev
+AUTH_COOKIE_HTTP_ONLY = True
+AUTH_COOKIE_PATH = '/'
+AUTH_COOKIE_SAMESITE = 'Lax'  # 'Lax' for navigation, 'Strict' for high security
 
 
 # Celery Config
