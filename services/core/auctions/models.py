@@ -48,6 +48,7 @@ class AuctionListing(UUIDMixin, TimestampMixin):
         DRAFT = "DRAFT", _("Draft")
         ACTIVE = "ACTIVE", _("Active")
         FINISHED = "FINISHED", _("Finished")
+        EXPIRED = "EXPIRED", _("Expired")
         CANCELLED = "CANCELLED", _("Cancelled")
 
     product: Any = models.ForeignKey(

@@ -1,4 +1,5 @@
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.utils.translation import gettext_lazy as _
 
 from .models import AuctionListing, BidTransaction, Product
 
@@ -22,6 +23,19 @@ class AuctionListingAdmin(admin.ModelAdmin):
     list_filter = ("status", "start_time", "end_time")
     search_fields = ("product__title",)
     inlines = [BidTransactionInline]
+    actions = ["cancel_auctions"]
+
+    @admin.action(description=_("Cancel selected auctions"))
+    def cancel_auctions(self, request, queryset):
+        updated_count = queryset.filter(status__in=[AuctionListing.Status.ACTIVE, AuctionListing.Status.DRAFT]).update(
+            status=AuctionListing.Status.CANCELLED
+        )
+
+        self.message_user(
+            request,
+            _("%(count)d auctions were successfully cancelled.") % {"count": updated_count},
+            messages.SUCCESS,
+        )
 
 
 @admin.register(BidTransaction)
