@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from .models import AuctionListing, BidTransaction, Product
@@ -19,9 +20,10 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(AuctionListing)
 class AuctionListingAdmin(admin.ModelAdmin):
-    list_display = ("id", "product", "status", "current_price", "end_time")
+    list_display = ("id", "product", "colored_status", "current_price", "end_time")
     list_filter = ("status", "start_time", "end_time")
-    search_fields = ("product__title",)
+    search_fields = ("product__title", "winner__username", "winner__email")
+    date_hierarchy = "created_at"
     inlines = [BidTransactionInline]
     actions = ["cancel_auctions"]
 
@@ -35,6 +37,21 @@ class AuctionListingAdmin(admin.ModelAdmin):
             request,
             _("%(count)d auctions were successfully cancelled.") % {"count": updated_count},
             messages.SUCCESS,
+        )
+
+    @admin.display(description=_("Status"), ordering="status")
+    def colored_status(self, obj):
+        colors = {
+            AuctionListing.Status.ACTIVE: "green",
+            AuctionListing.Status.FINISHED: "blue",
+            AuctionListing.Status.EXPIRED: "gray",
+            AuctionListing.Status.CANCELLED: "red",
+            AuctionListing.Status.DRAFT: "orange",
+        }
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}</span>',
+            colors.get(obj.status, "black"),
+            obj.get_status_display(),
         )
 
 
