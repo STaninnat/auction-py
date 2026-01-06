@@ -90,6 +90,37 @@ services:
     networks:
       - auction_network
 
+  beat:
+    image: auction/core:latest
+    container_name: auction_core_beat
+    user: "${USER_ID}:${GROUP_ID}"
+    build: ./services/core
+    command: celery -A config beat -l info
+    volumes:
+      - ./services/core:/app
+      - ./secrets:/app/secrets
+    environment:
+      - DEBUG=${DEBUG}
+      - SECRET_KEY=${DJANGO_SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=${POSTGRES_HOST}
+      - DB_PORT=${POSTGRES_PORT}
+      - SENTRY_DSN_CORE=${SENTRY_DSN_CORE}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      db:
+        condition: service_healthy
+      valkey:
+        condition: service_started
+      core:
+        condition: service_started
+    networks:
+      - auction_network
+
   realtime:
     image: auction/realtime:latest
     container_name: auction_realtime
