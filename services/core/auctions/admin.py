@@ -12,20 +12,41 @@ class BidTransactionInline(admin.TabularInline):
     can_delete = False
 
 
+class AuctionListingInline(admin.StackedInline):
+    model = AuctionListing
+    extra = 0
+    show_change_link = True
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "owner", "created_at")
+    list_display = ("id", "title", "owner", "image_preview", "created_at")
+    list_filter = ("created_at",)
     search_fields = ("title", "owner__username")
+    inlines = [AuctionListingInline]
+
+    @admin.display(description=_("Image"))
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />', obj.image.url)
+        return "-"
 
 
 @admin.register(AuctionListing)
 class AuctionListingAdmin(admin.ModelAdmin):
-    list_display = ("id", "product", "colored_status", "current_price", "end_time")
+    list_display = ("id", "product", "colored_status", "current_price", "buy_now_price", "end_time")
     list_filter = ("status", "start_time", "end_time")
     search_fields = ("product__title", "winner__username", "winner__email")
     date_hierarchy = "created_at"
     inlines = [BidTransactionInline]
     actions = ["cancel_auctions"]
+    fieldsets = (
+        (None, {"fields": ("product", "status", "winner")}),
+        (_("Time Settings"), {"fields": ("start_time", "end_time")}),
+        (_("Price Settings"), {"fields": ("starting_price", "buy_now_price", "current_price")}),
+        (_("System Info"), {"fields": ("created_at", "updated_at")}),
+    )
+    readonly_fields = ("created_at", "updated_at")
 
     @admin.action(description=_("Cancel selected auctions"))
     def cancel_auctions(self, request, queryset):
