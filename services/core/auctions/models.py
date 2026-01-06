@@ -70,6 +70,7 @@ class AuctionListing(UUIDMixin, TimestampMixin):
     )
     end_time: models.DateTimeField = models.DateTimeField(
         verbose_name=_("End Time"),
+        db_index=True,
     )
 
     # Money Settings

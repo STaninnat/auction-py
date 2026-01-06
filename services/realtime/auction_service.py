@@ -32,6 +32,9 @@ class AuctionService:
             if auction.status != "ACTIVE":
                 return {"success": False, "error": "Auction is not active"}
 
+            if datetime.utcnow() > auction.end_time.replace(tzinfo=None):
+                return {"success": False, "error": "Auction has expired"}
+
             if amount <= auction.current_price:
                 return {
                     "success": False,
