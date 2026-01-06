@@ -32,24 +32,30 @@ ALLOWED_HOSTS: list[str] = config('ALLOWED_HOSTS', default=[], cast=Csv())  # ty
 
 SECRETS_DIR = Path('/app/secrets')
 
-def load_key(filename: str) -> bytes:
-    """Helper function (Functional style) for securely reading key files"""
-    try:
-        with open(SECRETS_DIR / filename, 'rb') as f:
-            return f.read()
-    except FileNotFoundError:
-        if DEBUG:
-            print(f"WARNING: {filename} not found, generating ephemeral key.")
-            from cryptography.hazmat.primitives import serialization
-            from cryptography.hazmat.primitives.asymmetric import rsa
-            key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-            if "private" in filename:
-                return key.private_bytes(encoding=serialization.Encoding.PEM, format=serialization.PrivateFormat.PKCS8, encryption_algorithm=serialization.NoEncryption())
-            return key.public_key().public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo)
-        raise RuntimeError(f"Critical Security Error: {filename} not found in {SECRETS_DIR}")
+try:
+    with open(SECRETS_DIR / "private_key.pem", 'rb') as f:
+        PRIVATE_KEY = f.read()
+    with open(SECRETS_DIR / "public_key.pem", 'rb') as f:
+        PUBLIC_KEY = f.read()
+except FileNotFoundError:
+    if DEBUG:
+        print("WARNING: Keys not found, generating ephemeral keys.")
+        from cryptography.hazmat.primitives import serialization
+        from cryptography.hazmat.primitives.asymmetric import rsa
 
-PRIVATE_KEY = load_key("private_key.pem")
-PUBLIC_KEY = load_key("public_key.pem")
+        key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+
+        PRIVATE_KEY = key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=serialization.NoEncryption()
+        )
+        PUBLIC_KEY = key.public_key().public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+    else:
+        raise RuntimeError(f"Critical Security Error: Keys not found in {SECRETS_DIR}")
 
 
 # Application definition
@@ -227,8 +233,9 @@ LOGGING = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'users.authentication.CustomJWTAuthentication',
     ),
+
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
@@ -251,8 +258,18 @@ SIMPLE_JWT = {
     'AUDIENCE': config('JWT_AUDIENCE', default='auction:realtime'),
     'ISSUER': config('JWT_ISSUER', default='auction:core'),
 
+
     'TOKEN_OBTAIN_SERIALIZER': 'users.serializers.MyTokenObtainPairSerializer',
 }
+
+
+# Cookie Auth Settings
+AUTH_COOKIE = 'access_token'
+AUTH_COOKIE_REFRESH = 'refresh_token'
+AUTH_COOKIE_SECURE = not DEBUG  # True in prod, False in dev
+AUTH_COOKIE_HTTP_ONLY = True
+AUTH_COOKIE_PATH = '/'
+AUTH_COOKIE_SAMESITE = 'Lax'  # 'Lax' for navigation, 'Strict' for high security
 
 
 # Celery Config

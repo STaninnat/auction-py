@@ -6,7 +6,7 @@ from .serializers import AuctionListingSerializer
 
 class AuctionListAPIView(generics.ListAPIView):
     serializer_class = AuctionListingSerializer
-    permission_class = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         return AuctionListing.objects.filter(status="ACTIVE").order_by("-created_at")
