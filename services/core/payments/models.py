@@ -78,3 +78,43 @@ class WalletTransaction(UUIDMixin, TimestampMixin):
 
     def __str__(self):
         return f"{self.transaction_type}: {self.amount} ({self.wallet.user})"
+
+
+class WithdrawalRequest(UUIDMixin, TimestampMixin):
+    """
+    Manual Withdrawal Requests
+    """
+
+    class Status(models.TextChoices):
+        PENDING = "PENDING", _("Pending")
+        APPROVED = "APPROVED", _("Approved - Paid")
+        REJECTED = "REJECTED", _("Rejected")
+
+    user: models.ForeignKey = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="withdrawals",
+    )
+    amount: models.DecimalField = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        verbose_name=_("Amount"),
+    )
+    status: models.CharField = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+        verbose_name=_("Status"),
+    )
+    bank_details: models.TextField = models.TextField(
+        verbose_name=_("Bank Details / Notes"),
+        help_text="IBAN, Swift, Account Number, etc.",
+    )
+    admin_note: models.TextField = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_("Admin Note"),
+    )
+
+    def __str__(self):
+        return f"Withdrawal: {self.amount} - {self.user} ({self.status})"
