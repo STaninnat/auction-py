@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Wallet, WalletTransaction
+from .models import Wallet, WalletTransaction, WithdrawalRequest
 
 
 class WalletTransactionInline(admin.TabularInline):
@@ -23,4 +23,13 @@ class WalletTransactionAdmin(admin.ModelAdmin):
     list_filter = ("transaction_type", "created_at")
     readonly_fields = ("wallet", "transaction_type", "amount", "reference_id", "created_at")
     search_fields = ("wallet__user__username", "reference_id")
+    date_hierarchy = "created_at"
+
+
+@admin.register(WithdrawalRequest)
+class WithdrawalRequestAdmin(admin.ModelAdmin):
+    list_display = ("user", "amount", "status", "created_at")
+    list_filter = ("status", "created_at")
+    search_fields = ("user__username", "user__email", "bank_details")
+    readonly_fields = ("created_at", "updated_at")
     date_hierarchy = "created_at"
