@@ -19,6 +19,7 @@ class AuctionListing(Base):
     id = Column(UUID(as_uuid=False), primary_key=True)
     status = Column(String)
     current_price = Column(Numeric(12, 2))
+    end_time = Column(DateTime)
 
 
 class BidTransaction(Base):
