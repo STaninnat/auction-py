@@ -12,6 +12,16 @@ class User(Base):
     email = Column(String)
 
 
+class Wallet(Base):
+    # SYNC: Matches Django 'payments.Wallet' model (Default: payments_wallet)
+    __tablename__ = "payments_wallet"
+
+    id = Column(UUID(as_uuid=False), primary_key=True)
+    user_id = Column(UUID(as_uuid=False), ForeignKey("users.id"), unique=True)
+    balance = Column(Numeric(14, 2))
+    held_balance = Column(Numeric(14, 2))
+
+
 class AuctionListing(Base):
     # SYNC: Matches Django 'auctions.AuctionListing' model (Default: auctions_auctionlisting)
     __tablename__ = "auctions_auctionlisting"
