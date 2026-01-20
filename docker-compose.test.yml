@@ -1,0 +1,61 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: auction_test_db
+    env_file:
+      - .env.test
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data
+    networks:
+      - auction_test_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-test_user} -d ${POSTGRES_DB:-test_auction_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  valkey:
+    image: valkey/valkey:latest
+    container_name: auction_test_valkey
+    networks:
+      - auction_test_network
+
+  core:
+    image: auction/core:latest
+    container_name: auction_test_core
+    build: ./services/core
+    volumes:
+      - ./services/core:/app
+      - ./secrets:/app/secrets
+    env_file:
+      - .env.test
+    depends_on:
+      db:
+        condition: service_healthy
+      valkey:
+        condition: service_started
+    networks:
+      - auction_test_network
+
+  realtime:
+    image: auction/realtime:latest
+    container_name: auction_test_realtime
+    build: ./services/realtime
+    volumes:
+      - ./services/realtime:/app
+    env_file:
+      - .env.test
+    depends_on:
+      db:
+        condition: service_healthy
+      valkey:
+        condition: service_started
+    networks:
+      - auction_test_network
+
+volumes:
+  test_postgres_data:
+
+networks:
+  auction_test_network:
+    driver: bridge
