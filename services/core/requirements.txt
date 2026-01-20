@@ -10,3 +10,9 @@ python-decouple
 Pillow
 cryptography
 stripe
+
+# Testing
+pytest
+pytest-django
+factory-boy
+freezegun

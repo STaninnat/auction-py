@@ -30,7 +30,7 @@ warn_unused_configs = true
 explicit_package_bases = true
 
 [[tool.mypy.overrides]]
-module = "django.*"
+module = ["django.*", "pytest.*", "_pytest.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

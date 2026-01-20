@@ -11,3 +11,9 @@ python-decouple
 python-jose[cryptography]
 passlib[bcrypt]
 python-multipart
+
+# Testing
+pytest
+pytest-asyncio
+httpx
+pytest-mock
