@@ -66,7 +66,17 @@ async def websocket_endpoint(
                     )
 
                     if result["success"]:
-                        # If bid is successful, broadcast to Redis channel(Publish)
+                        # 1. Send Private ACK to the bidder with their new balance
+                        await websocket.send_json(
+                            {
+                                "type": "BID_ACK",
+                                "new_balance": result.get("new_balance"),
+                                "amount": result["new_price"],
+                                "timestamp": result["timestamp"],
+                            }
+                        )
+
+                        # 2. Broadcast to Redis channel (Public update)
                         broadcast_msg = json.dumps(
                             {
                                 "type": "NEW_BID",
