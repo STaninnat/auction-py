@@ -189,7 +189,7 @@ LOGGING = {
     'formatters': {
         'json': {
             # JSON Format: Suitable for ELK Stack, Datadog.
-            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            '()': 'pythonjsonlogger.json.JsonFormatter',
             'fmt': '%(levelname)s %(asctime)s %(name)s %(module)s %(message)s'
         },
         'readable': {
