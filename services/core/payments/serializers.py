@@ -19,7 +19,7 @@ class DepositSerializer(serializers.Serializer):
     Serializer to validate deposit amount
     """
 
-    amount = serializers.DecimalField(max_digits=12, decimal_places=2, min_value=1.00)
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2, min_value=1)
 
 
 class WithdrawSerializer(serializers.ModelSerializer):
