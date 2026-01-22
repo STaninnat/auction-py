@@ -32,4 +32,4 @@ async def redis_listener(
     finally:
         # Unsubscribe and close the connection
         await pubsub.unsubscribe(channel_name)
-        await pubsub.close()
+        await pubsub.aclose()
