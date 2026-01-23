@@ -83,7 +83,15 @@ superuser:
 # ==============================================================================
 # TESTING PROFILE (ISOLATED)
 # ==============================================================================
-test: test-build test-core test-realtime test-down
+test: generate-keys test-build test-core test-realtime test-e2e test-down
+
+generate-keys:
+	mkdir -p secrets
+	@if [ ! -f secrets/private_key.pem ]; then \
+		echo "Generating RSA Keys for Testing..."; \
+		openssl genrsa -out secrets/private_key.pem 2048; \
+		openssl rsa -in secrets/private_key.pem -outform PEM -pubout -out secrets/public_key.pem; \
+	fi
 
 test-build:
 	$(DOCKER_COMPOSE_TEST) build
@@ -93,6 +101,14 @@ test-core:
 
 test-realtime:
 	$(DOCKER_COMPOSE_TEST) run --rm realtime pytest
+
+test-e2e: generate-keys
+	$(DOCKER_COMPOSE_TEST) down -v
+	$(DOCKER_COMPOSE_TEST) up -d --wait
+	$(DOCKER_COMPOSE_TEST) exec core python manage.py migrate
+	$(DOCKER_COMPOSE_TEST) exec core python manage.py seed_e2e
+	$(DOCKER_COMPOSE_TEST) exec core pytest tests/e2e/test_flow.py
+	$(DOCKER_COMPOSE_TEST) down -v
 
 test-down:
 	$(DOCKER_COMPOSE_TEST) down -v

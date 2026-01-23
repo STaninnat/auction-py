@@ -9,7 +9,11 @@ services:
     networks:
       - auction_test_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-test_user} -d ${POSTGRES_DB:-test_auction_db}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-test_user} -d ${POSTGRES_DB:-test_auction_db}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -43,6 +47,7 @@ services:
     build: ./services/realtime
     volumes:
       - ./services/realtime:/app
+      - ./secrets:/app/secrets
     env_file:
       - .env.test
     depends_on:
