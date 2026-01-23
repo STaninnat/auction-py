@@ -16,3 +16,6 @@ pytest
 pytest-django
 factory-boy
 freezegun
+websockets
+httpx
+pytest-asyncio
