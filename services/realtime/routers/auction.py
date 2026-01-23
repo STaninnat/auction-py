@@ -113,4 +113,4 @@ async def websocket_endpoint(
     finally:
         # Cancel listener task and close Redis connection
         listener_task.cancel()
-        await redis_client.close()
+        await redis_client.aclose()

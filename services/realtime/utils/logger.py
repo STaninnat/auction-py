@@ -2,7 +2,7 @@ import logging
 import sys
 
 from decouple import config
-from pythonjsonlogger import jsonlogger
+from pythonjsonlogger import json
 
 
 class LoggerSetup:
@@ -30,7 +30,7 @@ class LoggerSetup:
             formatter = logging.Formatter(fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s", datefmt="%H:%M:%S")
         else:
             # Prod
-            formatter = jsonlogger.JsonFormatter(fmt="%(asctime)s %(levelname)s %(name)s %(message)s")
+            formatter = json.JsonFormatter(fmt="%(asctime)s %(levelname)s %(name)s %(message)s")
 
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
