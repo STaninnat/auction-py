@@ -39,6 +39,21 @@ class TestAuctionSearchAPI:
         assert len(results) == 1
         assert results[0]["product"]["title"] == "Laptop"
 
+    def test_filter_by_condition(self, api_client):
+        """Test filtering auctions by product condition."""
+        p1 = ProductFactory(title="New Phone", condition=Product.Condition.NEW)
+        p2 = ProductFactory(title="Used Phone", condition=Product.Condition.USED_GOOD)
+        AuctionListingFactory(product=p1, status=AuctionListing.Status.ACTIVE)
+        AuctionListingFactory(product=p2, status=AuctionListing.Status.ACTIVE)
+
+        url = reverse("auction_list")
+        response = api_client.get(url, {"condition": "NEW"})
+
+        assert response.status_code == status.HTTP_200_OK
+        results = response.data
+        assert len(results) == 1
+        assert results[0]["product"]["title"] == "New Phone"
+
     def test_filter_by_price_range(self, api_client):
         """Test filtering auctions by price range."""
         AuctionListingFactory(current_price="100.00", status=AuctionListing.Status.ACTIVE)
