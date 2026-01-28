@@ -37,3 +37,17 @@ class TestAuctionListingValidation:
         product = ProductFactory(title="Vintage Vase")
         auction = AuctionListingFactory(product=product, status=AuctionListing.Status.ACTIVE)
         assert str(auction) == "Vintage Vase (Status: ACTIVE)"
+
+    def test_product_defaults(self):
+        """Test that products have correct default category and condition."""
+        product = ProductFactory()
+        assert product.category == "OTHER"
+        assert product.condition == "USED_GOOD"
+
+    def test_product_valid_choices(self):
+        """Test creating product with valid non-default choices."""
+        from auctions.models import Product
+
+        product = ProductFactory(category=Product.Category.ELECTRONICS, condition=Product.Condition.NEW)
+        assert product.category == "ELECTRONICS"
+        assert product.condition == "NEW"

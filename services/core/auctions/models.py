@@ -14,6 +14,21 @@ class Product(UUIDMixin, TimestampMixin):
     Products to be auctioned (separate from the main auction items to ensure they are reusable).
     """
 
+    class Category(models.TextChoices):
+        ELECTRONICS = "ELECTRONICS", _("Electronics")
+        FASHION = "FASHION", _("Fashion")
+        HOME = "HOME", _("Home")
+        ART = "ART", _("Art")
+        COLLECTIBLES = "COLLECTIBLES", _("Collectibles")
+        VEHICLES = "VEHICLES", _("Vehicles")
+        OTHER = "OTHER", _("Other")
+
+    class Condition(models.TextChoices):
+        NEW = "NEW", _("New")
+        OPEN_BOX = "OPEN_BOX", _("Open Box")
+        USED_GOOD = "USED_GOOD", _("Used - Good")
+        USED_FAIR = "USED_FAIR", _("Used - Fair")
+
     owner: models.ForeignKey = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -33,6 +48,18 @@ class Product(UUIDMixin, TimestampMixin):
         blank=True,
         null=True,
         verbose_name="Image",
+    )
+    category: models.CharField = models.CharField(
+        max_length=50,
+        choices=Category.choices,
+        default=Category.OTHER,
+        verbose_name="Category",
+    )
+    condition: models.CharField = models.CharField(
+        max_length=50,
+        choices=Condition.choices,
+        default=Condition.USED_GOOD,
+        verbose_name="Condition",
     )
 
     def __str__(self):
