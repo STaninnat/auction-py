@@ -3,7 +3,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, permissions
 
 from .models import AuctionListing
-from .serializers import AuctionDetailSerializer, AuctionListingSerializer
+from .serializers import AuctionDetailSerializer, AuctionListingSerializer, UserAuctionSerializer
 
 
 class AuctionFilter(django_filters.FilterSet):
@@ -32,3 +32,11 @@ class AuctionRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = AuctionDetailSerializer
     permission_classes = [permissions.AllowAny]
     lookup_field = "id"
+
+
+class UserBidListAPIView(generics.ListAPIView):
+    serializer_class = UserAuctionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return AuctionListing.objects.filter(bids__bidder=self.request.user).distinct().order_by("-created_at")
