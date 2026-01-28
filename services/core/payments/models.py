@@ -65,6 +65,7 @@ class WalletTransaction(UUIDMixin, TimestampMixin):
     transaction_type: models.CharField = models.CharField(
         max_length=20,
         choices=Type.choices,
+        db_index=True,
         verbose_name="Transaction Type",
     )
     amount: models.DecimalField = models.DecimalField(
@@ -73,7 +74,7 @@ class WalletTransaction(UUIDMixin, TimestampMixin):
         default=0,
     )
     reference_id: models.CharField = models.CharField(
-        max_length=100, blank=True, null=True, help_text="e.g. Auction ID or Stripe Charge ID"
+        max_length=100, blank=True, null=True, db_index=True, help_text="e.g. Auction ID or Stripe Charge ID"
     )
 
     def __str__(self):
@@ -104,6 +105,7 @@ class WithdrawalRequest(UUIDMixin, TimestampMixin):
         max_length=20,
         choices=Status.choices,
         default=Status.PENDING,
+        db_index=True,
         verbose_name=_("Status"),
     )
     bank_details: models.TextField = models.TextField(
