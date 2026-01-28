@@ -53,12 +53,14 @@ class Product(UUIDMixin, TimestampMixin):
         max_length=50,
         choices=Category.choices,
         default=Category.OTHER,
+        db_index=True,
         verbose_name="Category",
     )
     condition: models.CharField = models.CharField(
         max_length=50,
         choices=Condition.choices,
         default=Condition.USED_GOOD,
+        db_index=True,
         verbose_name="Condition",
     )
 
@@ -116,6 +118,7 @@ class AuctionListing(UUIDMixin, TimestampMixin):
     current_price: models.DecimalField = models.DecimalField(
         max_digits=12,
         decimal_places=2,
+        db_index=True,
         verbose_name=_("Current Price"),
     )
 
