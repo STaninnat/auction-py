@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from users.models import User
 
-from .models import AuctionListing, Product
+from .models import AuctionListing, BidTransaction, Product
 
 
 class UserSummarySerializer(serializers.ModelSerializer):
@@ -32,3 +32,18 @@ class AuctionListingSerializer(serializers.ModelSerializer):
             "start_time",
             "end_time",
         ]
+
+
+class BidTransactionSerializer(serializers.ModelSerializer):
+    bidder = UserSummarySerializer(read_only=True)
+
+    class Meta:
+        model = BidTransaction
+        fields = ["id", "bidder", "amount", "created_at"]
+
+
+class AuctionDetailSerializer(AuctionListingSerializer):
+    bids = BidTransactionSerializer(many=True, read_only=True)
+
+    class Meta(AuctionListingSerializer.Meta):
+        fields = AuctionListingSerializer.Meta.fields + ["bids"]

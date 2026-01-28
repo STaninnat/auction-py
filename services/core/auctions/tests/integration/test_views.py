@@ -41,3 +41,19 @@ class TestAuctionListAPI:
         url = reverse("auction_detail", kwargs={"id": uuid.uuid4()})
         response = api_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_retrieve_auction_with_bids(self, api_client):
+        """Test retrieving auction with bid history."""
+        from auctions.tests.factories import BidTransactionFactory
+
+        auction = AuctionListingFactory(status=AuctionListing.Status.ACTIVE)
+        BidTransactionFactory(auction=auction, amount="50.00")
+        BidTransactionFactory(auction=auction, amount="100.00")
+
+        url = reverse("auction_detail", kwargs={"id": auction.id})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        bids = response.data["bids"]
+        assert len(bids) == 2
+        assert float(bids[0]["amount"]) == 100.00  # Ordering is by amount desc in model

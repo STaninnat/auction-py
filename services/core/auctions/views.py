@@ -3,7 +3,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, permissions
 
 from .models import AuctionListing
-from .serializers import AuctionListingSerializer
+from .serializers import AuctionDetailSerializer, AuctionListingSerializer
 
 
 class AuctionFilter(django_filters.FilterSet):
@@ -29,6 +29,6 @@ class AuctionListAPIView(generics.ListAPIView):
 
 class AuctionRetrieveAPIView(generics.RetrieveAPIView):
     queryset = AuctionListing.objects.all()
-    serializer_class = AuctionListingSerializer
+    serializer_class = AuctionDetailSerializer
     permission_classes = [permissions.AllowAny]
     lookup_field = "id"
