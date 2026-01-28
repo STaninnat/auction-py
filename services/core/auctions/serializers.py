@@ -78,3 +78,53 @@ class UserAuctionSerializer(AuctionListingSerializer):
             return "WINNING"
         else:
             return "OUTBID"
+
+
+class AuctionCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for creating an auction listing along with the product.
+    """
+
+    title = serializers.CharField(source="product.title")
+    description = serializers.CharField(source="product.description", required=False)
+    image = serializers.ImageField(source="product.image", required=False)
+    category = serializers.ChoiceField(choices=Product.Category.choices, source="product.category")
+    condition = serializers.ChoiceField(choices=Product.Condition.choices, source="product.condition")
+
+    class Meta:
+        model = AuctionListing
+        fields = [
+            "id",
+            "title",
+            "description",
+            "image",
+            "category",
+            "condition",
+            "start_time",
+            "end_time",
+            "starting_price",
+            "buy_now_price",
+        ]
+
+    def create(self, validated_data):
+        product_data = validated_data.pop("product")
+        owner = self.context["request"].user
+
+        # Create Product
+        product = Product.objects.create(owner=owner, **product_data)
+
+        # Create Auction Listing
+        # Initialize current_price to starting_price
+        validated_data["current_price"] = validated_data["starting_price"]
+        auction = AuctionListing.objects.create(product=product, status=AuctionListing.Status.DRAFT, **validated_data)
+
+        return auction
+
+
+class BidCreateSerializer(serializers.Serializer):
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2)
+
+    def validate_amount(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Bid amount must be positive.")
+        return value
