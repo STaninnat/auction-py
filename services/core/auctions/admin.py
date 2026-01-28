@@ -20,8 +20,8 @@ class AuctionListingInline(admin.StackedInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "owner", "image_preview", "created_at")
-    list_filter = ("created_at",)
+    list_display = ("id", "title", "category", "condition", "owner", "image_preview", "created_at")
+    list_filter = ("category", "condition", "created_at")
     search_fields = ("title", "owner__username")
     inlines = [AuctionListingInline]
 
@@ -35,7 +35,7 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(AuctionListing)
 class AuctionListingAdmin(admin.ModelAdmin):
     list_display = ("id", "product", "colored_status", "current_price", "buy_now_price", "end_time")
-    list_filter = ("status", "start_time", "end_time")
+    list_filter = ("status", "product__category", "start_time", "end_time")
     search_fields = ("product__title", "winner__username", "winner__email")
     date_hierarchy = "created_at"
     inlines = [BidTransactionInline]
