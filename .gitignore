@@ -215,3 +215,6 @@ secrets/
 .docker_data/
 postgres_data/
 valkey_data/
+
+# Self-documentation
+.self_docs/
