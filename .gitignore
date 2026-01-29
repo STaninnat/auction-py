@@ -216,6 +216,5 @@ secrets/
 postgres_data/
 valkey_data/
 
-# Documentation
-backend_capabilities.md
-backend_capabilities.txt
+# Self-documentation
+.self_docs/
