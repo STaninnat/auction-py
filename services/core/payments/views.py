@@ -8,8 +8,13 @@ from rest_framework import generics, permissions, status, views
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from .models import Wallet, WalletTransaction
-from .serializers import DepositSerializer, WalletSerializer, WithdrawSerializer
+from .models import Wallet, WalletTransaction, WithdrawalRequest
+from .serializers import (
+    DepositSerializer,
+    WalletSerializer,
+    WalletTransactionSerializer,
+    WithdrawSerializer,
+)
 from .stripe_utils import create_checkout_session, handle_webhook_event
 
 logger = logging.getLogger(__name__)
@@ -147,3 +152,20 @@ class WithdrawAPIView(generics.CreateAPIView):
                 amount=amount,
                 reference_id=str(withdrawal.id),
             )
+
+
+class WalletTransactionListAPIView(generics.ListAPIView):
+    serializer_class = WalletTransactionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Return transactions for the current user's wallet
+        return WalletTransaction.objects.filter(wallet__user=self.request.user).order_by("-created_at")
+
+
+class WithdrawalListAPIView(generics.ListAPIView):
+    serializer_class = WithdrawSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return WithdrawalRequest.objects.filter(user=self.request.user).order_by("-created_at")
