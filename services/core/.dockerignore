@@ -217,3 +217,7 @@ Dockerfile
 README.md
 .git
 .gitignore
+
+# Documentation
+backend_capabilities.md
+backend_capabilities.txt
