@@ -70,7 +70,8 @@ async def test_websocket_place_bid(authenticated_client, mock_redis):
             msg_data = json.loads(call_args[0][1])
             assert msg_data["type"] == "NEW_BID"
             assert msg_data["amount"] == "150.00"
-            assert msg_data["bidder"]["username"] == MOCK_USER.username
+            # masked username for "test_bidder" is "t***r"
+            assert msg_data["bidder"]["username"] == "t***r"
 
 
 @pytest.mark.asyncio

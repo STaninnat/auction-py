@@ -76,6 +76,15 @@ async def websocket_endpoint(
                             }
                         )
 
+                        # Mask username
+                        username = user.username
+                        if not username:
+                            masked_username = "Anonymous"
+                        elif len(username) <= 2:
+                            masked_username = f"{username[0]}***"
+                        else:
+                            masked_username = f"{username[0]}***{username[-1]}"
+
                         # 2. Broadcast to Redis channel (Public update)
                         broadcast_msg = json.dumps(
                             {
@@ -83,7 +92,7 @@ async def websocket_endpoint(
                                 "amount": result["new_price"],
                                 "bidder": {
                                     "id": str(user.id),
-                                    "username": user.username,
+                                    "username": masked_username,
                                 },
                                 "timestamp": result["timestamp"],
                             }
