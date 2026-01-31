@@ -10,6 +10,24 @@ class UserSummarySerializer(serializers.ModelSerializer):
         fields = ["id", "username"]
 
 
+class MaskedUserSummarySerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ["id", "username"]
+
+    def get_username(self, obj):
+        if not obj.username:
+            return "Anonymous"
+
+        # Simple masking: "j***e"
+        if len(obj.username) <= 2:
+            return f"{obj.username[0]}***"
+
+        return f"{obj.username[0]}***{obj.username[-1]}"
+
+
 class ProductSerializer(serializers.ModelSerializer):
     owner = UserSummarySerializer(read_only=True)
 
@@ -35,7 +53,7 @@ class AuctionListingSerializer(serializers.ModelSerializer):
 
 
 class BidTransactionSerializer(serializers.ModelSerializer):
-    bidder = UserSummarySerializer(read_only=True)
+    bidder = MaskedUserSummarySerializer(read_only=True)
 
     class Meta:
         model = BidTransaction
