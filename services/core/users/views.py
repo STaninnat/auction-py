@@ -88,9 +88,8 @@ class LoginView(TokenObtainPairView):
 
             set_auth_cookies(response, access, refresh)
 
-            # Remove tokens from response body for security
-            del response.data["access"]
-            del response.data["refresh"]
+            # Return simple success message instead of tokens or user data
+            response.data = {"detail": "Login successful"}
 
         return response
 
@@ -110,9 +109,7 @@ class RegisterView(generics.CreateAPIView):
         access = str(refresh.access_token)
 
         response = Response(
-            {
-                "user": UserSerializer(user).data,
-            },
+            {"detail": "Registration successful"},
             status=status.HTTP_201_CREATED,
         )
 

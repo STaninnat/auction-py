@@ -26,20 +26,12 @@ repos:
         args: [--fix]
       - id: ruff-format
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.1
+  - repo: local
     hooks:
       - id: mypy
-        additional_dependencies:
-          - types-requests
-          - types-PyYAML
-          - django-stubs
-          - celery-types
-          - python-decouple-stubs
-          - djangorestframework-stubs
-          - sqlalchemy
-          - redis
-          - fastapi
-          - pydantic
-          - sentry-sdk
+        name: mypy
+        entry: mypy
+        language: system
+        types: [python]
+        require_serial: true
         exclude: ^(docker/|migrations/|venv/|__pycache__/)

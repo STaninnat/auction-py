@@ -47,8 +47,8 @@ async def get_current_user(websocket: WebSocket, token: Optional[str] = Query(No
             issuer=JWT_ISSUER,
         )
 
-        user_id: str = payload.get("user_id")
-        username: str = payload.get("username", "")
+        user_id = payload.get("user_id")
+        username = payload.get("username", "")
 
         if user_id is None:
             raise Exception("Invalid authentication token")

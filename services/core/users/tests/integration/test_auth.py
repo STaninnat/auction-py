@@ -34,6 +34,7 @@ class AuthenticationTests(APITestCase):
         # Check tokens are NOT in body
         self.assertNotIn("access", response.data)
         self.assertNotIn("refresh", response.data)
+        self.assertEqual(response.data["detail"], "Registration successful")
 
         # Check cookies
         self.assertIn(settings.AUTH_COOKIE, response.cookies)
@@ -52,6 +53,7 @@ class AuthenticationTests(APITestCase):
         data = {"username": self.user_data["username"], "password": self.user_data["password"]}
         response = self.client.post(self.login_url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["detail"], "Login successful")
 
         self.assertIn(settings.AUTH_COOKIE, response.cookies)
         self.assertIn(settings.AUTH_COOKIE_REFRESH, response.cookies)
