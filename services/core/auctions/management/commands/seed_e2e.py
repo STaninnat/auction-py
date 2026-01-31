@@ -60,6 +60,9 @@ class Command(BaseCommand):
             auction.status = AuctionListing.Status.ACTIVE
             if auction.end_time < now:
                 auction.end_time = end_time
+            # RESET PRICES for fresh test state
+            auction.starting_price = Decimal("10.00")
+            auction.current_price = Decimal("10.00")
             auction.save()
 
         self.stdout.write(self.style.SUCCESS(f"Seeded Auction: {auction.id}"))

@@ -75,7 +75,7 @@ async def test_full_auction_flow():
             broadcast_data = json.loads(broadcast_msg)
             assert broadcast_data["type"] == "NEW_BID"
             assert float(broadcast_data["amount"]) == bid_amount
-            assert broadcast_data["bidder"]["username"] == "e2e_bidder"
+            assert broadcast_data["bidder"]["username"] == "e***r"
 
             # --- 5. LOGOUT ---
             # Need CSRF token for logout if using cookies
